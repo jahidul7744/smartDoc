@@ -7,6 +7,7 @@ use App\Repositories\Contracts\DiagnosticCenterRepositoryInterface;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 
 class DiagnosticCenterRepository implements DiagnosticCenterRepositoryInterface
 {
@@ -25,6 +26,54 @@ class DiagnosticCenterRepository implements DiagnosticCenterRepositoryInterface
         return DiagnosticCenter::query()
             ->active()
             ->find($id);
+    }
+
+    public function paginateForAdmin(array $filters, int $perPage = 15): LengthAwarePaginator
+    {
+        $query = DiagnosticCenter::query();
+        $query = $this->applyFilters($query, $filters);
+
+        return $query->latest()->paginate($perPage)->withQueryString();
+    }
+
+    public function allForSelect(): Collection
+    {
+        return DiagnosticCenter::query()
+            ->orderBy('name')
+            ->get(['id', 'name']);
+    }
+
+    public function find(int $id, array $relations = []): ?DiagnosticCenter
+    {
+        return DiagnosticCenter::query()
+            ->with($relations)
+            ->find($id);
+    }
+
+    public function create(array $attributes): DiagnosticCenter
+    {
+        return DiagnosticCenter::query()->create($attributes);
+    }
+
+    public function update(DiagnosticCenter $diagnosticCenter, array $attributes): DiagnosticCenter
+    {
+        $diagnosticCenter->fill($attributes);
+        $diagnosticCenter->save();
+
+        return $diagnosticCenter;
+    }
+
+    public function delete(DiagnosticCenter $diagnosticCenter): void
+    {
+        $diagnosticCenter->delete();
+    }
+
+    public function slugExists(string $slug, ?int $ignoreId = null): bool
+    {
+        return DiagnosticCenter::query()
+            ->when($ignoreId, fn (Builder $builder) => $builder->whereKeyNot($ignoreId))
+            ->where('slug', $slug)
+            ->exists();
     }
 
     protected function applyFilters(Builder $query, array $filters): Builder

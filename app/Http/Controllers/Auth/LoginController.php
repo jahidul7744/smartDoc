@@ -34,6 +34,10 @@ class LoginController extends Controller
             return redirect()->intended(route('dashboard'))->with('status', 'Welcome back!');
         }
 
+        if ($user->role === 'doctor') {
+            return redirect()->intended(route('doctor.dashboard'))->with('status', 'Welcome back, doctor!');
+        }
+
         return redirect()->intended(route('home'))->with('status', 'Welcome back!');
     }
 

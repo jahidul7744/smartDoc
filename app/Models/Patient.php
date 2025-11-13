@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Patient extends Model
 {
@@ -66,6 +67,21 @@ class Patient extends Model
         )->count();
 
         return (int) round(($completed / count($requiredAttributes)) * 100);
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    public function diagnoses(): HasMany
+    {
+        return $this->hasMany(Diagnosis::class);
+    }
+
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class);
     }
 }
 

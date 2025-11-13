@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Arr;
 
 class DiagnosticCenter extends Model
@@ -71,6 +72,21 @@ class DiagnosticCenter extends Model
     public function specializationLabels(): array
     {
         return Arr::wrap($this->specializations ?? []);
+    }
+
+    public function doctors(): HasMany
+    {
+        return $this->hasMany(Doctor::class);
+    }
+
+    public function appointments(): HasMany
+    {
+        return $this->hasMany(Appointment::class);
+    }
+
+    public function prescriptions(): HasMany
+    {
+        return $this->hasMany(Prescription::class);
     }
 }
 

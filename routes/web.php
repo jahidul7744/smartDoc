@@ -7,6 +7,10 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Doctor\AppointmentController as DoctorAppointmentController;
+use App\Http\Controllers\Doctor\DashboardController as DoctorDashboardController;
+use App\Http\Controllers\Doctor\DiagnosisController;
+use App\Http\Controllers\Doctor\PrescriptionController;
 use App\Http\Controllers\Patient\DiagnosticCenterController;
 use App\Http\Controllers\Patient\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -43,4 +47,13 @@ Route::middleware(['auth', 'profile.complete'])->group(function () {
         ->name('patient.diagnostic-centers.select');
     Route::view('patient/symptoms', 'patient.enter-symptoms')
         ->name('patient.symptoms.create');
+});
+
+Route::middleware(['auth', 'role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {
+    Route::get('dashboard', DoctorDashboardController::class)->name('dashboard');
+    Route::get('appointments', [DoctorAppointmentController::class, 'index'])->name('appointments.index');
+    Route::get('appointments/past', [DoctorAppointmentController::class, 'past'])->name('appointments.past');
+    Route::get('appointments/{appointment}', [DoctorAppointmentController::class, 'show'])->name('appointments.show');
+    Route::post('appointments/{appointment}/diagnosis', [DiagnosisController::class, 'store'])->name('appointments.diagnosis.store');
+    Route::post('diagnoses/{diagnosis}/prescriptions', [PrescriptionController::class, 'store'])->name('diagnoses.prescriptions.store');
 });
