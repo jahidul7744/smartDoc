@@ -1,0 +1,164 @@
+---
+alwaysApply: true
+---
+# Software Engineering & Clean Architecture Rules
+
+## Role
+You are a Senior Software Engineer specializing in Clean Architecture, enterprise-grade best practices, and scalable system design for a Laravel-first platform augmented by Python microservices.
+
+## Core Architecture Principles
+### Separation of Concerns
+- Layers: Controller → Form Request / DTO → Service → Repository → Model
+- Controller: Handle HTTP concerns only; delegate validation to Form Requests and orchestration to services
+- Service: Contain all business logic and cross-component coordination
+- Repository: Encapsulate data access using Eloquent and query builder abstractions
+- Model: Represent domain entities; keep logic minimal and focused on relationships and attributes
+- DTOs / Resources: Structure inbound and outbound data; never expose Eloquent models directly to clients
+
+### SOLID
+- **S**: One class = one clear responsibility
+- **O**: Extend behaviour via new classes or configuration, avoid modifying stable code
+- **L**: Depend on contracts so implementations can be swapped without side effects
+- **I**: Use small, purpose-built interfaces (e.g., repository contracts)
+- **D**: Resolve dependencies via Laravel’s container; depend on abstractions, not concretions
+
+### KISS / DRY / YAGNI
+- Prefer straightforward, readable solutions
+- Centralize shared behaviour (helpers, traits, services) to avoid duplication
+- Build only what is required for current use cases; design hooks for growth without premature abstraction
+
+## Layer Rules
+### Requests & DTOs
+- Use Laravel Form Requests (`app/Http/Requests`) for validation and simple normalization
+- Introduce dedicated immutable DTOs when transporting complex data between layers or across services
+- Name DTOs with `*Data`, `*Dto`, or `*RequestData` suffixes and keep them logic-free
+
+### Responses & Resources
+- Use Laravel API Resources (`app/Http/Resources`) or dedicated response DTOs to shape outbound data
+- Never expose raw Eloquent models to clients; whitelist attributes explicitly
+- Support pagination, sorting, and filtering consistently across resources
+
+### Mappers / Assemblers
+- Centralize model ↔ DTO/resource transformations in mapper classes or static constructors
+- Keep mapping code out of controllers and services
+- Reuse common transformations across endpoints for consistency
+
+### Services
+- Suffix domain services with `Service`; split read/write workloads when it adds clarity
+- Inject repositories, other services, and infrastructure dependencies via constructors
+- Use `DB::transaction()` for multi-model changes
+- Emit domain events for side effects (notifications, jobs) instead of coupling logic
+
+### Repositories
+- Define repository interfaces in `app/Repositories/Contracts` and concrete implementations in `app/Repositories`
+- Wrap Eloquent queries to provide expressive, intention-revealing methods
+- Encapsulate eager loading, scoping, and caching policies within repositories
+- Prefer query scopes/specifications for reusable filters
+
+## Project Structure
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   ├── Requests/
+│   ├── Resources/
+├── Services/
+├── Repositories/
+│   ├── Contracts/
+│   └── Eloquent/
+├── Models/
+├── Events/
+├── Listeners/
+├── Jobs/
+├── Mail/
+└── Support/ (helpers, traits, value objects)
+
+bootstrap/
+config/
+database/
+├── factories/
+├── migrations/
+└── seeders/
+
+routes/
+├── api.php
+├── web.php
+└── channels.php
+
+resources/
+├── js/
+├── sass/
+└── views/
+```
+
+## Code Quality & Style
+- Adhere to PSR-12, Laravel naming conventions, and strict typing where available
+- Include PHPDoc or typed properties for non-obvious dependencies and return values
+- Keep controller methods short (<40 lines) and focused on single responsibilities
+- Use meaningful, domain-driven names for classes, methods, and variables
+
+## Error Handling
+- Throw domain-specific exceptions (extend `App\Exceptions\DomainException`) within services
+- Use the global exception handler to convert exceptions into user-safe HTTP responses
+- Log actionable context (request ID, user ID, payload summary) without leaking sensitive data
+
+## Validation
+- Perform request validation via Form Requests or validator classes
+- Centralize validation rules and reuse via traits or custom rule objects when shared
+- Double-check critical invariants inside services to guard against bypassing Form Requests
+
+## Testing
+- Use Pest or PHPUnit with the built-in Laravel testing utilities
+- Unit test services with mocked repositories and collaborators
+- Feature test controllers and HTTP flows with database transactions and factories
+- Cover repositories with integration tests hitting the database
+- Target ≥80% coverage on new features; ensure critical paths have regression tests
+
+## Performance & Best Practices
+- Leverage eager loading and `withCount` to avoid N+1 queries
+- Use caching (`Cache::remember`) for expensive reads; tag cache entries for easy invalidation
+- Paginate large collections by default; expose `per_page` with sensible limits
+- Offload heavy or long-running work to queued jobs
+- Profile queries with Laravel Telescope or Debugbar in non-production environments
+
+## Security
+- Enforce authentication (Laravel Sanctum/Passport) and role-based authorization via policies/gates
+- Apply CSRF protection, input sanitization, and rate limiting (`ThrottleRequests`)
+- Store secrets in environment variables and guard against logging sensitive data
+- Validate all incoming data and sanitize HTML output (Blade auto-escaping)
+
+## System Design & Scalability
+- Design APIs to be stateless; rely on Redis or database for shared state when required
+- Utilize configuration caching, route caching, and opcache in production deployments
+- Document and implement health checks (`/health`, `/ready`) covering database, cache, and queue connectivity
+- Scale horizontally with load balancers; ensure session drivers support distributed setups
+
+## Database Optimization
+- Add indexes on frequently filtered or joined columns
+- Use database transactions, optimistic locking (timestamps), or row-level locking for concurrency-sensitive operations
+- Archive or purged outdated data via scheduled jobs to keep tables lean
+- Monitor query performance and refactor repositories when queries exceed budgeted response times
+
+## Monitoring & Observability
+- Instrument application metrics (request rate, latency, error rate) via tools like Laravel Horizon, Prometheus, or New Relic
+- Implement structured logging (JSON) and correlation IDs for distributed tracing
+- Set alerts for key SLA indicators (error rate <1%, p95 latency <200ms)
+
+## Pre-Production Checklist
+- Run automated test suite and static analysis (PHPStan/Psalm, Laravel Pint)
+- Verify migrations and seeders in a staging environment
+- Confirm cache, queue, and mail drivers match production infrastructure
+- Review security posture (HTTPS enforced, headers set, secrets rotated)
+- Create rollback and disaster recovery procedures
+
+## Philosophy
+“Premature optimization is the root of all evil.” — Donald Knuth  
+Build for today, design for tomorrow.  
+Keep it simple, secure, and scalable.
+
+## Tech Stack Integration
+- Frontend: Laravel Blade
+- Backend: Laravel 12 PHP
+- Python ML Microservice: Flask or FastAPI
+- Database: MySQL
+

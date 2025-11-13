@@ -15,11 +15,23 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
+        $patientUser = User::factory()->create([
+            'name' => 'Test Patient',
+            'email' => 'patient@example.com',
+            'phone' => '01700000000',
+            'date_of_birth' => '1990-01-01',
+            'gender' => 'male',
+            'address' => '123 Demo Street, Demo City',
+            'role' => 'patient',
+        ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $patientUser->patient()->create([
+            'medical_history' => 'No significant history.',
+            'blood_group' => 'O+',
+            'allergies' => 'None',
+            'emergency_contact_name' => 'Demo Contact',
+            'emergency_contact_phone' => '01700000001',
+            'profile_completed_at' => now(),
         ]);
     }
 }

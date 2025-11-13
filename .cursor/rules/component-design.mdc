@@ -1,0 +1,167 @@
+---
+alwaysApply: true
+---
+# Component Design Rule
+
+## Objective
+Maintain a clear, modular Laravel application structure that supports clean separation of concerns, consistent naming, and straightforward discoverability for feature components.
+
+## Directory Structure
+Follow the canonical layout below. Each segment represents a bounded responsibility; keep feature-specific logic within its designated area.
+
+```
+app/
+├── Console/
+├── Exceptions/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Auth/
+│   │   │   ├── LoginController.php
+│   │   │   ├── RegisterController.php
+│   │   │   └── ForgotPasswordController.php
+│   │   ├── Patient/
+│   │   │   ├── ProfileController.php
+│   │   │   ├── AppointmentController.php
+│   │   │   ├── SymptomController.php
+│   │   │   └── PrescriptionController.php
+│   │   ├── Doctor/
+│   │   │   ├── DashboardController.php
+│   │   │   ├── AppointmentController.php
+│   │   │   ├── DiagnosisController.php
+│   │   │   └── PrescriptionController.php
+│   │   ├── DiagnosticCenter/
+│   │   │   ├── CenterController.php
+│   │   │   └── DoctorManagementController.php
+│   │   └── API/
+│   │       ├── v1/
+│   │       │   ├── PatientController.php
+│   │       │   ├── DoctorController.php
+│   │       │   ├── AppointmentController.php
+│   │       │   └── MLController.php
+│   ├── Middleware/
+│   │   ├── Authenticate.php
+│   │   ├── CheckProfileComplete.php
+│   │   ├── CheckRole.php
+│   │   └── ThrottleRequests.php
+│   └── Requests/
+│       ├── Patient/
+│       │   ├── ProfileRequest.php
+│       │   └── AppointmentRequest.php
+│       └── Doctor/
+│           ├── DiagnosisRequest.php
+│           └── PrescriptionRequest.php
+├── Models/
+│   ├── User.php
+│   ├── Patient.php
+│   ├── Doctor.php
+│   ├── DiagnosticCenter.php
+│   ├── Appointment.php
+│   ├── Diagnosis.php
+│   ├── Prescription.php
+│   ├── PrescriptionMedicine.php
+│   ├── SymptomLog.php
+│   ├── Notification.php
+│   └── Review.php
+├── Services/
+│   ├── MLService.php
+│   ├── AppointmentService.php
+│   ├── NotificationService.php
+│   ├── PrescriptionService.php
+│   ├── PDFService.php
+│   └── SymptomAnalysisService.php
+├── Repositories/
+│   ├── PatientRepository.php
+│   ├── DoctorRepository.php
+│   ├── AppointmentRepository.php
+│   └── PrescriptionRepository.php
+├── Jobs/
+│   ├── SendAppointmentConfirmation.php
+│   ├── SendAppointmentReminder.php
+│   ├── SendPrescriptionEmail.php
+│   └── GeneratePrescriptionPDF.php
+├── Mail/
+│   ├── AppointmentConfirmation.php
+│   ├── AppointmentReminder.php
+│   └── PrescriptionReady.php
+├── Events/
+│   ├── AppointmentBooked.php
+│   ├── DiagnosisCreated.php
+│   └── PrescriptionGenerated.php
+└── Listeners/
+    ├── SendAppointmentNotifications.php
+    └── SendPrescriptionNotification.php
+
+resources/
+├── views/
+│   ├── layouts/
+│   │   ├── app.blade.php
+│   │   ├── patient.blade.php
+│   │   └── doctor.blade.php
+│   ├── auth/
+│   │   ├── login.blade.php
+│   │   ├── register.blade.php
+│   │   └── forgot-password.blade.php
+│   ├── patient/
+│   │   ├── dashboard.blade.php
+│   │   ├── profile.blade.php
+│   │   ├── select-center.blade.php
+│   │   ├── enter-symptoms.blade.php
+│   │   ├── prediction-results.blade.php
+│   │   ├── doctor-list.blade.php
+│   │   ├── book-appointment.blade.php
+│   │   ├── appointments.blade.php
+│   │   ├── prescriptions.blade.php
+│   │   └── medical-history.blade.php
+│   ├── doctor/
+│   │   ├── dashboard.blade.php
+│   │   ├── appointments.blade.php
+│   │   ├── patient-details.blade.php
+│   │   ├── create-diagnosis.blade.php
+│   │   └── create-prescription.blade.php
+│   ├── diagnostic-center/
+│   │   ├── dashboard.blade.php
+│   │   ├── manage-doctors.blade.php
+│   │   └── appointments.blade.php
+│   ├── emails/
+│   │   ├── appointment-confirmation.blade.php
+│   │   ├── appointment-reminder.blade.php
+│   │   └── prescription-ready.blade.php
+│   └── pdfs/
+│       └── prescription-template.blade.php
+
+database/
+├── migrations/
+│   ├── 2025_01_01_000001_create_users_table.php
+│   ├── 2025_01_01_000002_create_patients_table.php
+│   ├── 2025_01_01_000003_create_doctors_table.php
+│   ├── 2025_01_01_000004_create_diagnostic_centers_table.php
+│   ├── 2025_01_01_000005_create_appointments_table.php
+│   ├── 2025_01_01_000006_create_diagnoses_table.php
+│   ├── 2025_01_01_000007_create_prescriptions_table.php
+│   └── ...
+├── seeders/
+│   ├── DatabaseSeeder.php
+│   ├── DiagnosticCenterSeeder.php
+│   ├── DoctorSeeder.php
+│   └── SpecializationSeeder.php
+└── factories/
+    ├── PatientFactory.php
+    ├── DoctorFactory.php
+    └── AppointmentFactory.php
+```
+
+## Component Guidelines
+- **Controllers**: Keep thin; delegate business logic to services. Group by domain (`Auth`, `Patient`, `Doctor`, `DiagnosticCenter`, `API`).
+- **Requests**: Validate input per domain. Reuse form requests across controllers when validation rules align.
+- **Models**: Represent Eloquent entities with clear relationships and guarded/fillable definitions. Keep domain logic minimal; move business rules to services.
+- **Services**: Encapsulate business rules and orchestration logic. One service per cohesive domain capability (e.g., appointments, prescriptions, notifications).
+- **Repositories**: Abstract complex query logic; expose expressive read/write methods for services.
+- **Jobs & Events**: Use jobs for asynchronous work (emails, PDF generation). Emit domain events (`AppointmentBooked`, `DiagnosisCreated`) and consume via listeners to keep side-effects decoupled.
+- **Mail**: Store mailable classes per notification type; ensure Blade templates in `resources/views/emails`.
+- **Views**: Organize Blade templates by audience (`patient`, `doctor`, `diagnostic-center`) with shared layouts and partials. Keep presentation logic in Blade; move heavy processing to view models or services.
+- **Database Layer**: Separate migrations, seeders, and factories. Name migrations sequentially, seed essential reference data, and ensure factories cover test data scenarios.
+
+## Enforcement
+- New components must align with this structure.
+- Any deviations require documented justification and review.
+- Periodically audit directories to ensure adherence and remove orphaned or misfiled components.

@@ -1,0 +1,29 @@
+rules:
+  - name: Avoid Overengineering
+    description: Keep code simple, minimal, and aligned with business logic only.
+    match: "*"
+    directives:
+      - "Avoid writing unnecessary abstractions, patterns, or classes."
+      - "Only generate what is required to fulfill the described functionality."
+      - "Do not generate placeholder or demo code unless explicitly asked."
+      - "Do not duplicate code; prefer reuse and concise logic."
+
+  - name: Code Quality
+    description: Enforce clean, maintainable code.
+    match: "*"
+    directives:
+      - "Follow SOLID principles where meaningful."
+      - "Avoid long methods (>50 lines). Split logic into smaller functions."
+      - "Avoid unnecessary getters/setters or boilerplate."
+      - "Use meaningful variable and method names."
+      - "Remove unused imports, variables, or commented-out code."
+
+  - name: AI Guidance
+    description: Limit AI verbosity
+    match: "*"
+    directives:
+      - "Respond only with the minimal and most effective code snippet."
+      - "Avoid generating extra logs, mocks, or testing scaffolds unless requested."
+      - "Never generate speculative features or unconfirmed assumptions."
+
+

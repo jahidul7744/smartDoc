@@ -1,0 +1,26 @@
+---
+alwaysApply: true
+---
+# SOLID System Architecture Rule
+
+## Purpose
+Ensure every code contribution across backend and frontend adheres to enterprise-grade engineering discipline, emphasizing SOLID principles and the approved system architecture baseline.
+
+## Scope
+- Applies to all backend (Java/Spring) services.
+- Applies to all frontend (Angular/TypeScript) applications.
+- Covers feature development, refactoring, bug fixes, and architectural changes.
+
+## Core Requirements
+- **SOLID Compliance**: Design classes and modules to follow the SOLID principles (Single Responsibility, Open/Closed, Liskov Substitution, Interface Segregation, Dependency Inversion). Document rationale for any unavoidable trade-offs.
+- **Architecture Alignment**: Align implementations with the approved senior engineering system architecture. Any deviation requires a documented architectural review and approval before implementation.
+- **Cross-Layer Consistency**: Maintain consistent abstractions, naming conventions, and module boundaries between frontend and backend layers to preserve domain integrity.
+- **Extensibility First**: Favor patterns that support future feature growth (e.g., strategy, factory, adapter) while avoiding premature optimization.
+- **Testability**: Structure code for high test coverage; ensure dependencies can be mocked and behaviors verified in isolation.
+- **Documentation**: Capture architectural decisions in ADRs or equivalent records whenever SOLID trade-offs or architectural variances are introduced.
+
+## Enforcement
+- Perform peer reviews with explicit SOLID and architecture checkpoints.
+- Reject pull requests lacking SOLID compliance justification or architectural approval where required.
+- Surface violations in retrospectives and create remediation tasks when necessary.
+
