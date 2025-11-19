@@ -35,4 +35,13 @@ return [
         ],
     ],
 
+    'ml' => [
+        'base_url' => env('ML_SERVICE_BASE_URL', 'http://127.0.0.1:8001'),
+        'predict_endpoint' => env('ML_SERVICE_PREDICT_ENDPOINT', '/api/v1/predict'),
+        'api_key' => env('ML_SERVICE_API_KEY'),
+        'timeout' => (int) env('ML_SERVICE_TIMEOUT', 10),
+        'retry_attempts' => (int) env('ML_SERVICE_RETRY_ATTEMPTS', 3),
+        'retry_delay' => (int) env('ML_SERVICE_RETRY_DELAY', 250),
+    ],
+
 ];

@@ -18,6 +18,7 @@ use App\Http\Controllers\Doctor\DiagnosisController;
 use App\Http\Controllers\Doctor\PrescriptionController;
 use App\Http\Controllers\Patient\DiagnosticCenterController;
 use App\Http\Controllers\Patient\ProfileController;
+use App\Http\Controllers\Patient\SymptomController;
 use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/login')->name('home');
@@ -50,8 +51,10 @@ Route::middleware(['auth', 'profile.complete'])->group(function () {
         ->name('patient.diagnostic-centers.index');
     Route::post('patient/diagnostic-centers/select', [DiagnosticCenterController::class, 'select'])
         ->name('patient.diagnostic-centers.select');
-    Route::view('patient/symptoms', 'patient.enter-symptoms')
+    Route::get('patient/symptoms', [SymptomController::class, 'create'])
         ->name('patient.symptoms.create');
+    Route::post('patient/symptoms', [SymptomController::class, 'store'])
+        ->name('patient.symptoms.store');
 });
 
 Route::middleware(['auth', 'role:doctor'])->prefix('doctor')->name('doctor.')->group(function () {

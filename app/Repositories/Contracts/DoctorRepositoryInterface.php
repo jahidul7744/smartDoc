@@ -21,5 +21,14 @@ interface DoctorRepositoryInterface
     public function listByDiagnosticCenter(int $diagnosticCenterId): \Illuminate\Database\Eloquent\Collection;
 
     public function allWithUser(): \Illuminate\Database\Eloquent\Collection;
+
+    /**
+     * @param list<string> $specializations
+     */
+    public function listByCenterAndSpecializations(
+        int $diagnosticCenterId,
+        array $specializations,
+        int $limit = 3
+    ): \Illuminate\Database\Eloquent\Collection;
 }
 

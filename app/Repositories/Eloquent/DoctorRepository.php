@@ -85,5 +85,26 @@ class DoctorRepository implements DoctorRepositoryInterface
             ->orderBy('user_id')
             ->get();
     }
+
+    public function listByCenterAndSpecializations(
+        int $diagnosticCenterId,
+        array $specializations,
+        int $limit = 3
+    ): EloquentCollection {
+        $query = Doctor::query()
+            ->with('user')
+            ->where('diagnostic_center_id', $diagnosticCenterId)
+            ->where('is_active', true);
+
+        if (! empty($specializations)) {
+            $query->whereIn('specialization', $specializations);
+        }
+
+        return $query
+            ->orderByDesc('rating')
+            ->orderByDesc('experience_years')
+            ->limit($limit)
+            ->get();
+    }
 }
 
